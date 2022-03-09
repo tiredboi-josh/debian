@@ -21,7 +21,7 @@ function startup() {
 startup
 
 function backup(){
-    mkdir -p /etc/restore_bind
+    mkdir -p /etc/restore-bind
     cp -rp --no-clobber /etc/bind /etc/restore-bind;
 }
 
