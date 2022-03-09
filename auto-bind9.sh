@@ -1,15 +1,15 @@
 #!/bin/bash
 
 function startup() {
-    service=\"bind9\"
+    service="bind9"
     variables=${1-DEFAULT};
-    serv=\"service $service status \";
+    serv="service $service status ";
     $serv  > fuckshit.txt ;
-    stat=\"grep dead fuckshit.txt\";
+    stat="grep dead fuckshit.txt";
     $stat;
-    match=\"grep --only-matching dead fuckshit.txt\";
+    match="grep --only-matching dead fuckshit.txt";
    
-    if [[ \"$match\"==\"true\" ]]
+    if [[ "$match"=="true" ]]
     then
         service $service start
         sleep 1
@@ -18,10 +18,10 @@ function startup() {
 
 }
 
-startup
+#startup
 
 function backup(){
-    mkdir -p /etc/restore_bind
+    mkdir -p /etc/restore-bind
     cp -rp --no-clobber /etc/bind /etc/restore-bind;
 }
 
@@ -51,7 +51,7 @@ function make_configs(){
 
 
     echo "$TTL  3600
-@	IN 	SOA	 $primary_host_name.$domain_name.local. secondaryHostName.$domain_name.local. (
+@	IN 	SOA	 $primary_host_name.$domain_name.local. $secondaryHostName.$domain_name.local. (
 			      2     ; Serial
 			 604800     ; Refresh 
 			  86400		; Retry
@@ -72,7 +72,7 @@ www	IN	CNAME	@
 
 
 
-echo "zone	\"$domain_name.local\" {
+echo "zone \"$domain_name.local\" {
 	type master;
 	file \"/etc/bind/db.records\";
 	allow-transfer {\"none\";};
@@ -98,7 +98,7 @@ allow-transfer{\"none\";};
 
 logging {
 	channel query.log {
-	file \"var/lib/bind/query.log\" size 40m;
+	file \"/var/lib/bind/query.log\" size 40m;
 	severity debug 3;
 	};
 	category queries {query.log;};
@@ -123,7 +123,6 @@ version none;
 	allow-transfer {none;};
 	
 	forwarders {
-		$secondary_ip;
 		8.8.8.8;
 		8.8.4.4;
 };
@@ -139,11 +138,15 @@ version none;
 
 
 
-
+touch /var/lib/bind/query.log
+chown bind:bind /var/lib/bind/query.log
+chmod 750 /var/lib/bind/query.log
 chown root:bind $file_records;
 chown root:bind $file_zones;
 chown root:bind $file_security;
-
+chmod 750 $file_records
+chmod 750 $file_zones
+chmod 750 $file_security
 
 
 }   
@@ -152,9 +155,9 @@ chown root:bind $file_security;
 make_configs
 
 
-echo \"The configs have been made and default configs have been backed up to /etc/restore_bind\";
-echo \"Checks have not been made look at after configuration in dooms day on what to do\";
-echo \"if everything returns no errors bind needs restart\";
+echo "The configs have been made and default configs have been backed up to /etc/restore_bind";
+echo "Checks have not been made look at after configuration in dooms day on what to do";
+echo "if everything returns no errors bind needs restart";
 
 
 exit 0
