@@ -1,15 +1,15 @@
 #!/bin/bash
 
 function startup() {
-    service="bind9"
+    service=\"bind9\"
     variables=${1-DEFAULT};
-    serv="service $service status ";
+    serv=\"service $service status \";
     $serv  > fuckshit.txt ;
-    stat="grep dead fuckshit.txt";
+    stat=\"grep dead fuckshit.txt\";
     $stat;
-    match="grep --only-matching dead fuckshit.txt";
+    match=\"grep --only-matching dead fuckshit.txt\";
    
-    if [[ "$match"=="true" ]]
+    if [[ \"$match\"==\"true\" ]]
     then
         service $service start
         sleep 1
@@ -31,22 +31,22 @@ backup
 
 function make_configs(){
 
-    file_records="/etc/bind/db.records"
-    file_zones="/etc/bind/named.conf.local"
-    file_security="/etc/bind/named.conf.options"
-    TTL="$"+"TTL"
+    file_records=\"/etc/bind/db.records\"
+    file_zones=\"/etc/bind/named.conf.local\"
+    file_security=\"/etc/bind/named.conf.options\"
+    TTL="\$TTL"
 
     
-    read -p "what is your host name: " primary_host_name;
-    read -p "what is your domain: " domain_name;
-    read -p "what is your IP ADDR: " local_ip;
-    read -p "what is secondary host name: " secondary_host_name;
-    read -p "what is secondary IP ADDR: " secondary_ip;
-    read -p "what is mail host name: " mail_host_name;
-    read -p "what is mail IP ADDR: " mail_ip;
-    rev_local_ip=$(printf "$local_ip" | awk -F '.' '{print $3,$2,$1}' OFS='.');
-    rev_secondary_ip=$(printf "$secondary_ip" | awk -F '.' '{print $3,$2,$1}' OFS='.');
-    rev_mail_ip=$(printf "$mail_ip" | awk -F '.' '{print $3,$2,$1}' OFS='.');
+    read -p \"what is your host name: \" primary_host_name;
+    read -p \"what is your domain: \" domain_name;
+    read -p \"what is your IP ADDR: \" local_ip;
+    read -p \"what is secondary host name: \" secondary_host_name;
+    read -p \"what is secondary IP ADDR: \" secondary_ip;
+    read -p \"what is mail host name: \" mail_host_name;
+    read -p \"what is mail IP ADDR: \" mail_ip;
+    rev_local_ip=$(printf \"$local_ip\" | awk -F '.' '{print $3,$2,$1}' OFS='.');
+    rev_secondary_ip=$(printf \"$secondary_ip\" | awk -F '.' '{print $3,$2,$1}' OFS='.');
+    rev_mail_ip=$(printf \"$mail_ip\" | awk -F '.' '{print $3,$2,$1}' OFS='.');
 
 
 
@@ -59,46 +59,46 @@ function make_configs(){
 			 604800 )   ; Negative Cache TTL
 
 @	IN 	NS	$primary_host_name.$domain_name.local.
-@	IN 	NS	$Secondary_host_name.$domain_name.local.
+@	IN 	NS	$secondary_host_name.$domain_name.local.
 @	IN 	MX	10	$mail_host_name.$domain_name.local.
 $primary_host_name	IN 	A	$local_ip
-$Secondary_host_name	IN	A	$Secondary_ip
+$secondary_host_name	IN	A	$Secondary_ip
 $mail_host_name	IN	A	$mail_ip
 www	IN	CNAME	@
 10	IN	PTR	$primary_host_name.$domain_name.local.
-20	IN	PTR	$Secondary_host_name.$domain_name.local.
+20	IN	PTR	$secondary_host_name.$domain_name.local.
 30	IN	PTR	$mail_host_name.$domain_name.local." > $file_records;
 
 
 
 
-echo "zone	"$domain_name.local" {
+echo "zone	\"$domain_name.local\" {
 	type master;
-	file "/etc/bind/db.records";
-	allow-transfer {"none";};
+	file \"/etc/bind/db.records\";
+	allow-transfer {\"none\";};
 };
 
-zone "$revip.in-addr.arpa" {
+zone \"$rev_local_ip.in-addr.arpa\" {
 	type master;
-file "/etc/bind/db.records";
-allow-transfer{"none";};
+file \"/etc/bind/db.records\";
+allow-transfer{\"none\";};
 };
 
-zone "$rev_secondary_ip.in-addr.arpa" {
+zone \"$rev_secondary_ip.in-addr.arpa\" {
 	type master;
-file "/etc/bind/db.records";
-allow-transfer{"none";};
+file \"/etc/bind/db.records\";
+allow-transfer{\"none\";};
 };
 
-zone "$rev_mail_ip.in-addr.arpa" {
+zone \"$rev_mail_ip.in-addr.arpa\" {
 	type master;
-file "/etc/bind/db.records";
-allow-transfer{"none";};
+file \"/etc/bind/db.records\";
+allow-transfer{\"none\";};
 };
 
 logging {
 	channel query.log {
-	file "var/lib/bind/query.log" size 40m;
+	file \"var/lib/bind/query.log\" size 40m;
 	severity debug 3;
 	};
 	category queries {query.log;};
@@ -106,14 +106,14 @@ logging {
 
 
 
-echo "acl "allow"	{
+echo "acl \"allow\"	{
 	$local_ip;
     172.0.0.1;
 	$secondary_ip;
 };
 
 options	{
-directory "/var/cache/bind";
+directory \"/var/cache/bind\";
 
 version none;
 	server-id none;
@@ -123,7 +123,7 @@ version none;
 	allow-transfer {none;};
 	
 	forwarders {
-		$Secondary_ip;
+		$secondary_ip;
 		8.8.8.8;
 		8.8.4.4;
 };
@@ -152,9 +152,9 @@ chown root:bind $file_security;
 make_configs
 
 
-echo "The configs have been made and default configs have been backed up to /etc/restore_bind";
-echo "Checks have not been made look at after configuration in dooms day on what to do";
-echo "if everything returns no errors bind needs restart";
+echo \"The configs have been made and default configs have been backed up to /etc/restore_bind\";
+echo \"Checks have not been made look at after configuration in dooms day on what to do\";
+echo \"if everything returns no errors bind needs restart\";
 
 
 exit 0
