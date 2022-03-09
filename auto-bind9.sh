@@ -21,7 +21,7 @@ function startup() {
 startup
 
 function backup(){
-    mkdir -p /etc/restore-bind
+    mkdir -p /etc/restore_bind
     cp -rp --no-clobber /etc/bind /etc/restore-bind;
 }
 
@@ -31,22 +31,22 @@ backup
 
 function make_configs(){
 
-    file_records=\"/etc/bind/db.records\"
-    file_zones=\"/etc/bind/named.conf.local\"
-    file_security=\"/etc/bind/named.conf.options\"
+    file_records="/etc/bind/db.records"
+    file_zones="/etc/bind/named.conf.local"
+    file_security="/etc/bind/named.conf.options"
     TTL="\$TTL"
 
     
-    read -p \"what is your host name: \" primary_host_name;
-    read -p \"what is your domain: \" domain_name;
-    read -p \"what is your IP ADDR: \" local_ip;
-    read -p \"what is secondary host name: \" secondary_host_name;
-    read -p \"what is secondary IP ADDR: \" secondary_ip;
-    read -p \"what is mail host name: \" mail_host_name;
-    read -p \"what is mail IP ADDR: \" mail_ip;
-    rev_local_ip=$(printf \"$local_ip\" | awk -F '.' '{print $3,$2,$1}' OFS='.');
-    rev_secondary_ip=$(printf \"$secondary_ip\" | awk -F '.' '{print $3,$2,$1}' OFS='.');
-    rev_mail_ip=$(printf \"$mail_ip\" | awk -F '.' '{print $3,$2,$1}' OFS='.');
+    read -p 'what is your host name: ' primary_host_name;
+    read -p 'what is your domain: ' domain_name;
+    read -p 'what is your IP ADDR: ' local_ip;
+    read -p 'what is secondary host name: ' secondary_host_name;
+    read -p 'what is secondary IP ADDR: ' secondary_ip;
+    read -p 'what is mail host name: ' mail_host_name;
+    read -p 'what is mail IP ADDR: ' mail_ip;
+    rev_local_ip=$(printf "$local_ip" | awk -F '.' '{print $3,$2,$1}' OFS='.');
+    rev_secondary_ip=$(printf "$secondary_ip" | awk -F '.' '{print $3,$2,$1}' OFS='.');
+    rev_mail_ip=$(printf "$mail_ip" | awk -F '.' '{print $3,$2,$1}' OFS='.');
 
 
 
@@ -62,7 +62,7 @@ function make_configs(){
 @	IN 	NS	$secondary_host_name.$domain_name.local.
 @	IN 	MX	10	$mail_host_name.$domain_name.local.
 $primary_host_name	IN 	A	$local_ip
-$secondary_host_name	IN	A	$Secondary_ip
+$secondary_host_name	IN	A	$secondary_ip
 $mail_host_name	IN	A	$mail_ip
 www	IN	CNAME	@
 10	IN	PTR	$primary_host_name.$domain_name.local.
@@ -139,14 +139,11 @@ version none;
 
 
 
-touch /var/lib/bind/query.log;
-chown bind:bind /var/lib/bind/query.log;
+
 chown root:bind $file_records;
 chown root:bind $file_zones;
 chown root:bind $file_security;
-chmod 750 $file_records;
-chmod 750 $file_zones;
-chmod 750 $file_security;
+
 
 
 }   
