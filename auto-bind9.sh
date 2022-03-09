@@ -139,11 +139,14 @@ version none;
 
 
 
-
+touch /var/lib/bind/query.log;
+chown bind:bind /var/lib/bind/query.log;
 chown root:bind $file_records;
 chown root:bind $file_zones;
 chown root:bind $file_security;
-
+chmod 750 $file_records;
+chmod 750 $file_zones;
+chmod 750 $file_security;
 
 
 }   
