@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function startup {
+function startup() {
     service="bind9"
     variables=${1-DEFAULT};
     serv="service $service status ";
@@ -20,41 +20,43 @@ function startup {
 
 startup
 
-function backup{
-    cp -R /etc/bind /etc/restore-bind;
+function backup(){
+    mkdir -p /etc/restore_bind
+    cp -rp --no-clobber /etc/bind /etc/restore-bind;
 }
 
 
 backup
 
 
-function make_configs{
+function make_configs(){
 
     file_records="/etc/bind/db.records"
     file_zones="/etc/bind/named.conf.local"
-    file_security/"/etc/bind/named.conf.options"
-
+    file_security="/etc/bind/named.conf.options"
+    TTL="$"+"TTL"
 
     
-    read -p "what is your host name" primary_host_name;
-    read -p "what is your domain" domain_name;
-    read -p "what is your IP ADDR" local_ip;
-    read -p "what is secondary host name" secondary_host_name;
-    read -p "what is secondary IP ADDR" secondary_ip;
-    read -p "what is mail host name" mail_host_name;
-    read -p "what is mail IP ADDR" mail_ip;
-    revip=$(printf "$local_ip" | awk -F '.' '{print $3,$2,$1}' OFS='.');
+    read -p "what is your host name: " primary_host_name;
+    read -p "what is your domain: " domain_name;
+    read -p "what is your IP ADDR: " local_ip;
+    read -p "what is secondary host name: " secondary_host_name;
+    read -p "what is secondary IP ADDR: " secondary_ip;
+    read -p "what is mail host name: " mail_host_name;
+    read -p "what is mail IP ADDR: " mail_ip;
+    rev_local_ip=$(printf "$local_ip" | awk -F '.' '{print $3,$2,$1}' OFS='.');
+    rev_secondary_ip=$(printf "$secondary_ip" | awk -F '.' '{print $3,$2,$1}' OFS='.');
+    rev_mail_ip=$(printf "$mail_ip" | awk -F '.' '{print $3,$2,$1}' OFS='.');
 
 
 
-    echo"$TTL 3600
-
+    echo "$TTL  3600
 @	IN 	SOA	 $primary_host_name.$domain_name.local. secondaryHostName.$domain_name.local. (
-			1		; Serial
-			604800	; Refresh 
-			86400		; Retry
-			2419200	; Expire
-			604800 )	; Negative Cache TTL
+			      2     ; Serial
+			 604800     ; Refresh 
+			  86400		; Retry
+			2419200     ; Expire
+			 604800 )   ; Negative Cache TTL
 
 @	IN 	NS	$primary_host_name.$domain_name.local.
 @	IN 	NS	$Secondary_host_name.$domain_name.local.
@@ -62,66 +64,77 @@ function make_configs{
 $primary_host_name	IN 	A	$local_ip
 $Secondary_host_name	IN	A	$Secondary_ip
 $mail_host_name	IN	A	$mail_ip
-DNS	IN	CNAME	$primary_host_name
+www	IN	CNAME	@
 10	IN	PTR	$primary_host_name.$domain_name.local.
 20	IN	PTR	$Secondary_host_name.$domain_name.local.
-30	IN	PTR	$mail_host_name.$domain_name.local." >> $file_records;
+30	IN	PTR	$mail_host_name.$domain_name.local." > $file_records;
 
 
 
 
-echo "Zone	“$domain_name.local” {
+echo "zone	"$domain_name.local" {
 	type master;
-	File “/etc/bind/db.records;
-	Allow-transfer {“none”;};
+	file "/etc/bind/db.records";
+	allow-transfer {"none";};
 };
 
-Zone “$revip.in-addr.arpa” {
-	Type master;
-File “/etc/bind/db.records”;
-allow-transfer{“none”;};
+zone "$revip.in-addr.arpa" {
+	type master;
+file "/etc/bind/db.records";
+allow-transfer{"none";};
 };
 
-Logging {
-	Channel query.log {
-	File “var/lib/bind/query.log” size 40m;
-	Severity debug 3;
+zone "$rev_secondary_ip.in-addr.arpa" {
+	type master;
+file "/etc/bind/db.records";
+allow-transfer{"none";};
+};
+
+zone "$rev_mail_ip.in-addr.arpa" {
+	type master;
+file "/etc/bind/db.records";
+allow-transfer{"none";};
+};
+
+logging {
+	channel query.log {
+	file "var/lib/bind/query.log" size 40m;
+	severity debug 3;
 	};
-	Category queries {query.log;};
-};
-" >> $file_zones;
+	category queries {query.log;};
+};" > $file_zones;
 
 
 
-echo "Acl “allow”	{
-	$primary_ip;
+echo "acl "allow"	{
+	$local_ip;
     172.0.0.1;
 	$secondary_ip;
 };
 
-Options	{
-Directory “/var/cache/bind”;
+options	{
+directory "/var/cache/bind";
 
-Version none;
-	Server-id none;
-	Empty-zones-enable no;
-	Allow-recursion {allow;};
-	Allow-query-cache {any;};
-	Allow-transfer {none;};
+version none;
+	server-id none;
+	empty-zones-enable no;
+	allow-recursion {allow;};
+	allow-query-cache {any;};
+	allow-transfer {none;};
 	
-	Forwarders {
+	forwarders {
 		$Secondary_ip;
 		8.8.8.8;
 		8.8.4.4;
 };
-	Dnssec-enable yes;
-	Dnssec-validation auto;
+	dnssec-enable yes;
+	dnssec-validation auto;
 	
 	auth-nxdomain no; 	#conform to RFC1035
-	Listen-on port 53 {allow;};
-	listen -on-v6 no;
+	listen-on port 53 {allow;};
+	listen-on-v6 {none;};
 };
-" >> $file_security;
+" > $file_security;
 
 
 
