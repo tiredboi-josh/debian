@@ -33,5 +33,5 @@ net.ipv6.conf.lo.disable_ipv6 = 1" >> /etc/sysctl.conf
 
 service procps restart
 service procps status 
-sleep [30]
+sleep 30
 iptables -L
