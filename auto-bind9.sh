@@ -108,7 +108,7 @@ logging {
 
 echo "acl \"allow\"	{
 	$local_ip;
-    172.0.0.1;
+    127.0.0.1;
 	$secondary_ip;
 };
 
