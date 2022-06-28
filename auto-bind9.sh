@@ -38,7 +38,7 @@ function make_configs(){
 
     
     read -p 'what is your host name: ' primary_host_name;
-    read -p 'what is your domain: ' domain_name;
+    read -p 'what is your domain (EX: domain.com): ' domain_name;
     read -p 'what is your IP ADDR: ' local_ip;
     read -p 'what is secondary host name: ' secondary_host_name;
     read -p 'what is secondary IP ADDR: ' secondary_ip;
@@ -51,28 +51,28 @@ function make_configs(){
 
 
     echo "$TTL  3600
-@	IN 	SOA	 $primary_host_name.$domain_name.local. $secondaryHostName.$domain_name.local. (
+@	IN 	SOA	 $primary_host_name.$domain_name. $secondaryHostName.$domain_name. (
 			      2     ; Serial
 			 604800     ; Refresh 
 			  86400		; Retry
 			2419200     ; Expire
 			 604800 )   ; Negative Cache TTL
 
-@	IN 	NS	$primary_host_name.$domain_name.local.
-@	IN 	NS	$secondary_host_name.$domain_name.local.
-@	IN 	MX	10	$mail_host_name.$domain_name.local.
+@	IN 	NS	$primary_host_name.$domain_name.
+@	IN 	NS	$secondary_host_name.$domain_name.
+@	IN 	MX	10	$mail_host_name.$domain_name.
 $primary_host_name	IN 	A	$local_ip
 $secondary_host_name	IN	A	$secondary_ip
 $mail_host_name	IN	A	$mail_ip
 www	IN	CNAME	@
-10	IN	PTR	$primary_host_name.$domain_name.local.
-20	IN	PTR	$secondary_host_name.$domain_name.local.
-30	IN	PTR	$mail_host_name.$domain_name.local." > $file_records;
+10	IN	PTR	$primary_host_name.$domain_name.
+20	IN	PTR	$secondary_host_name.$domain_name.
+30	IN	PTR	$mail_host_name.$domain_name." > $file_records;
 
 
 
 
-echo "zone \"$domain_name.local\" {
+echo "zone \"$domain_name\" {
 	type master;
 	file \"/etc/bind/db.records\";
 	allow-transfer {\"none\";};
