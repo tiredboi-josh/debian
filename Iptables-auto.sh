@@ -9,7 +9,7 @@ read -p "Enter the outbound TCP ports you want open: " tcpOutbound;
 
 
 
-cd ..
+cd ~
 iptables-save > ./default.iptables.bck
 iptables -F
 ip6tables -P INPUT DROP
